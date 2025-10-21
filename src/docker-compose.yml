@@ -1,0 +1,19 @@
+services:
+  nginx:
+    build: ./requirements/nginx
+    container_name: nginx
+    ports:
+      - "443:443"
+      - "8080:80"  # for testing before SSL
+    volumes:
+      - website_data:/var/www/html
+    networks:
+      - inception
+    restart: always
+
+volumes:
+  website_data:
+
+networks:
+  inception:
+    driver: bridge
