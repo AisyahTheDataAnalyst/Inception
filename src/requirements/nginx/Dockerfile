@@ -17,7 +17,7 @@ RUN mkdir -p /etc/nginx/ssl && \
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 
 # Copy your custom HTML
-COPY ./html/index.html /var/www/html/index.html
+COPY ./tools/index.html /var/www/html/index.html
 
 # Set proper permissions
 RUN chown -R www-data:www-data /var/www/html
