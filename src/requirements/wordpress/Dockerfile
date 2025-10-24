@@ -1,6 +1,8 @@
 FROM debian:bullseye
 
-RUN apt update && apt install -y php7.4 php7.4-fpm php7.4-mysqli wget mariadb-client && apt clean
+RUN apt update \
+	&& apt install -y php7.4 php7.4-fpm php7.4-mysqli wget mariadb-client \
+	&& apt clean
 
 # Install WordPress CLI
 RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \

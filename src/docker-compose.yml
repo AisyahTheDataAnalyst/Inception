@@ -31,24 +31,16 @@ services:
       - WP_USER=${WP_USER}
       - WP_USER_PASSWORD=${WP_USER_PASSWORD}
       - WP_USER_EMAIL=${WP_USER_EMAIL}
-
     volumes:
       - wordpress_data:/var/www/html
     networks:
       - inception
 
   nginx:
-    image: nginx:latest
+    build: ./requirements/nginx
     container_name: nginx
-    restart: always
-    depends_on:
-      - wordpress
     ports:
       - "443:443"
-      - "80:80"
-    volumes:
-      - wordpress_data:/var/www/html
-      - nginx_ssl:/etc/nginx/ssl
     networks:
       - inception
 
