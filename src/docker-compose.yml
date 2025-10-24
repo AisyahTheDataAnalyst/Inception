@@ -12,15 +12,19 @@ services:
     restart: always
 
   mariadb:
-    build: ./requirements/mariadb
+    image: mariadb:latest
     container_name: mariadb
-    env_file:
-      - .env
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=your_root_password
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wpuser
+      - MYSQL_PASSWORD=wppass
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
       - inception
-    restart: always
+
 
 
 volumes:
