@@ -1,9 +1,12 @@
 FROM debian:bullseye
 
 # Install dependencies
-RUN apt-get update && apt-get install -y \
-    php-fpm php-mysqli php-cli wget tar curl \
+RUN apt-get update \
+	&& apt-get install -y php-fpm php-mysqli php-cli wget tar curl \
     && apt-get clean
+
+# ✅ Create the missing socket directory for PHP-FPM
+RUN mkdir -p /run/php
 
 # Download and extract WordPress
 RUN mkdir -p /var/www/html
