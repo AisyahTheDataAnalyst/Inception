@@ -10,8 +10,8 @@ RUN mkdir -p /etc/nginx/ssl && \
     openssl req -x509 -nodes -days 365 \
     -subj "/C=MY/ST=KL/L=KL/O=42School/CN=localhost" \
     -newkey rsa:2048 \
-    -keyout /etc/nginx/ssl/inception.key \
-    -out /etc/nginx/ssl/inception.crt \
+    -keyout /etc/nginx/ssl/aimokhta.42.fr.key \
+    -out /etc/nginx/ssl/aimokhta.42.fr.crt \
 	-subj "/C=MY/ST=KL/L=KL/O=42KL/OU=student/CN=aimokhta.42.fr"
 
 # Copy nginx configuration
