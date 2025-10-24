@@ -11,7 +11,8 @@ RUN mkdir -p /etc/nginx/ssl && \
     -subj "/C=MY/ST=KL/L=KL/O=42School/CN=localhost" \
     -newkey rsa:2048 \
     -keyout /etc/nginx/ssl/inception.key \
-    -out /etc/nginx/ssl/inception.crt
+    -out /etc/nginx/ssl/inception.crt \
+	-subj "/C=MY/ST=KL/L=KL/O=42KL/OU=student/CN=aisyah.42.fr"
 
 # Copy nginx configuration
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
