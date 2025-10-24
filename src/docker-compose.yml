@@ -1,40 +1,4 @@
 services:
-  mariadb:
-    image: mariadb:latest
-    container_name: mariadb
-    restart: always
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-
-    volumes:
-      - mariadb_data:/var/lib/mysql
-    networks:
-      - inception
-
-  wordpress:
-    image: wordpress:php8.2-fpm
-    container_name: wordpress
-    restart: always
-    depends_on:
-      - mariadb
-    environment:
-      - WORDPRESS_DB_HOST=mariadb:3306
-      - WORDPRESS_DB_NAME=${MYSQL_DATABASE}
-      - WORDPRESS_DB_USER=${MYSQL_USER}
-      - WORDPRESS_DB_PASSWORD=${MYSQL_PASSWORD}
-      - WP_ADMIN_USER=${WP_ADMIN_USER}
-      - WP_ADMIN_PASSWORD=${WP_ADMIN_PASSWORD}
-      - WP_ADMIN_EMAIL=${WP_ADMIN_EMAIL}
-      - WP_USER=${WP_USER}
-      - WP_USER_PASSWORD=${WP_USER_PASSWORD}
-      - WP_USER_EMAIL=${WP_USER_EMAIL}
-    volumes:
-      - wordpress_data:/var/www/html
-    networks:
-      - inception
 
   nginx:
     build: ./requirements/nginx
@@ -44,13 +8,20 @@ services:
     networks:
       - inception
 
+  wordpress:
+    build: ./requirements/wordpress
+    container_name: wordpress
+    expose:
+      - "9000"
+    volumes:
+      - wordpress_data:/var/www/html
+    networks:
+      - inception
+
+volumes:
+  wordpress_data:
+
 networks:
   inception:
     driver: bridge
-
-volumes:
-  mariadb_data:
-  wordpress_data:
-  nginx_ssl:
-
 

@@ -1,18 +1,25 @@
 FROM debian:bullseye
 
-RUN apt update \
-	&& apt install -y php7.4 php7.4-fpm php7.4-mysqli wget mariadb-client \
-	&& apt clean
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    php-fpm php-mysqli php-cli wget tar curl \
+    && apt-get clean
 
-# Install WordPress CLI
-RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
-    && chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp
-
-COPY ./tools/setup.sh /tmp/setup.sh
-RUN chmod +x /tmp/setup.sh
-
+# Download and extract WordPress
+RUN mkdir -p /var/www/html
 WORKDIR /var/www/html
 
-CMD ["sh", "/tmp/setup.sh"]
+RUN wget https://wordpress.org/latest.tar.gz \
+    && tar -xzf latest.tar.gz --strip-components=1 \
+    && rm latest.tar.gz
+
+# Copy configuration (to be created next)
+COPY ./conf/wp-config.php /var/www/html/wp-config.php
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html
 
 EXPOSE 9000
+
+# Start PHP-FPM in foreground
+CMD ["php-fpm7.4", "-F"]
