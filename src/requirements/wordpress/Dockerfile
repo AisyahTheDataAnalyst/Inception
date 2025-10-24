@@ -14,4 +14,3 @@ WORKDIR /var/www/html
 CMD ["sh", "/tmp/setup.sh"]
 
 EXPOSE 9000
-CMD ["php-fpm7.4", "-F"]
