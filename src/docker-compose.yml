@@ -1,16 +1,4 @@
 services:
-  nginx:
-    build: ./requirements/nginx
-    container_name: nginx
-    ports:
-      - "443:443"
-      - "8080:80"  # for testing before SSL
-    volumes:
-      - website_data:/var/www/html
-    networks:
-      - inception
-    restart: always
-
   mariadb:
     image: mariadb:latest
     container_name: mariadb
@@ -25,11 +13,41 @@ services:
     networks:
       - inception
 
+  wordpress:
+    image: wordpress:php8.2-fpm
+    container_name: wordpress
+    restart: always
+    depends_on:
+      - mariadb
+    environment:
+      - WORDPRESS_DB_HOST=mariadb:3306
+      - WORDPRESS_DB_NAME=wordpress
+      - WORDPRESS_DB_USER=wpuser
+      - WORDPRESS_DB_PASSWORD=wppass
+    volumes:
+      - wordpress_data:/var/www/html
+    networks:
+      - inception
 
-
-volumes:
-  website_data:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    depends_on:
+      - wordpress
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - wordpress_data:/var/www/html
+    networks:
+      - inception
 
 networks:
   inception:
     driver: bridge
+
+volumes:
+  mariadb_data:
+  wordpress_data:
+
