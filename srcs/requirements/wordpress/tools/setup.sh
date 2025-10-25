@@ -18,26 +18,27 @@ while true; do
     echo "Still waiting for MariaDB... ($counter/30)"
 done
 
-# Check if WordPress is already installed
-if wp core is-installed --allow-root >/dev/null 2>&1; then
-    echo "WordPress is already installed."
-else
-    echo "Installing WordPress..."
-    
-    # Download WordPress if not present
-    if [ ! -f /var/www/html/wp-config.php ]; then
-        echo "Downloading WordPress..."
-        wp core download --allow-root --locale=en_US
-    fi
+# Check if WordPress core files are downloaded
+if [ ! -f /var/www/html/wp-settings.php ]; then
+    echo "Downloading WordPress..."
+    wp core download --allow-root --locale=en_US
+fi
 
-    # Create wp-config.php
-    echo "Creating wp-config.php..."
+# Check if WordPress is already installed in database
+if wp core is-installed --allow-root >/dev/null 2>&1; then
+    echo "WordPress is already installed in database."
+else
+    echo "WordPress not installed in database, proceeding with installation..."
+    
+    # Create or update wp-config.php with --force flag
+    echo "Creating/updating wp-config.php..."
     wp config create --allow-root \
         --dbname="${MYSQL_DATABASE}" \
         --dbuser="${MYSQL_USER}" \
         --dbpass="${MYSQL_PASSWORD}" \
         --dbhost="mariadb:3306" \
-        --locale=en_US
+        --locale=en_US \
+        --force
 
     # Install WordPress
     echo "Running WordPress installation..."
