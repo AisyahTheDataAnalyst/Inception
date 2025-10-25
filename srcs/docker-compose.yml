@@ -1,17 +1,16 @@
 services:
   nginx:
-    restart: unless-stopped
     build: ./requirements/nginx
     container_name: nginx
     ports:
       - "443:443"
-      - "80:80"
     volumes:
       - wordpress_data:/var/www/html
     depends_on:
       - wordpress
     networks:
       - inception
+    restart: unless-stopped
 
   mariadb:
     build: ./requirements/mariadb
@@ -24,13 +23,11 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mariadb_data:/var/lib/mysql
-      - /home/aimokhta/data/mariadb:/var/lib/mysql:rw
     networks:
       - inception
     restart: unless-stopped
 
   wordpress:
-    restart: unless-stopped
     build: ./requirements/wordpress
     container_name: wordpress
     env_file: .env
@@ -45,6 +42,7 @@ services:
       - mariadb
     networks:
       - inception
+    restart: unless-stopped
 
 volumes:
   wordpress_data:
