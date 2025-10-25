@@ -11,7 +11,7 @@ RUN mkdir -p /run/mysqld && \
     chown -R mysql:mysql /var/lib/mysql
 
 # Copy configuration
-COPY ./conf/my.cnf /etc/mysql/my.cnf
+COPY ./conf/mariadb.cnf /etc/mysql/mariadb.cnf
 
 # Copy setup script
 COPY ./tools/setup.sh /tmp/setup.sh
