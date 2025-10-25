@@ -1,10 +1,17 @@
 #!/bin/sh
-
 set -e
 
 echo "Waiting for MariaDB..."
+# More robust waiting with timeout
+counter=0
 while ! mysql -h mariadb -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}" -e "SHOW DATABASES;" >/dev/null 2>&1; do
   sleep 3
+  counter=$((counter+1))
+  if [ $counter -gt 20 ]; then
+    echo "ERROR: Could not connect to MariaDB after 60 seconds"
+    exit 1
+  fi
+  echo "Still waiting for MariaDB... ($counter/20)"
 done
 
 echo "MariaDB is ready!"
