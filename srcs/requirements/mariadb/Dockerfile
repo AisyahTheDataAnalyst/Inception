@@ -10,12 +10,12 @@ RUN mkdir -p /run/mysqld && \
     chown -R mysql:mysql /run/mysqld && \
     chown -R mysql:mysql /var/lib/mysql
 
+# Copy configuration
+COPY ./conf/my.cnf /etc/mysql/my.cnf
+
 # Copy setup script
 COPY ./tools/setup.sh /tmp/setup.sh
 RUN chmod +x /tmp/setup.sh
-
-# Copy configuration if you have custom my.cnf
-# COPY ./conf/my.cnf /etc/mysql/my.cnf
 
 EXPOSE 3306
 
