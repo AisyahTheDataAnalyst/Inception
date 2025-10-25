@@ -1,0 +1,55 @@
+services:
+  nginx:
+    restart: unless-stopped
+    build: ./requirements/nginx
+    container_name: nginx
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - wordpress_data:/var/www/html
+    depends_on:
+      - wordpress
+    networks:
+      - inception
+
+  mariadb:
+    build: ./requirements/mariadb
+    container_name: mariadb
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - /home/aimokhta/data/mariadb:/var/lib/mysql:rw
+    networks:
+      - inception
+    restart: unless-stopped
+
+  wordpress:
+    restart: unless-stopped
+    build: ./requirements/wordpress
+    container_name: wordpress
+    env_file: .env
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - wordpress_data:/var/www/html
+    depends_on:
+      - mariadb
+    networks:
+      - inception
+
+volumes:
+  wordpress_data:
+  mariadb_data:
+
+networks:
+  inception:
+    driver: bridge
