@@ -6,7 +6,7 @@ echo "Starting MariaDB setup..."
 # Initialize database if not exists
 if [ ! -d "/var/lib/mysql/mysql" ]; then
     echo "Initializing MariaDB data directory..."
-    mysql_install_db --user=mysql --datadir=/var/lib/mysql
+    mysql_install_db --user=mysql --datadir=/var/lib/mysql > /dev/null
     
     echo "Starting temporary MariaDB for setup..."
     mysqld_safe --datadir=/var/lib/mysql --nowatch &
@@ -17,16 +17,18 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
         sleep 2
     done
     
-    echo "Configuring MariaDB users and database..."
-    # Set root password and create database with proper user permissions
+    echo "Configuring MariaDB..."
     mysql -uroot <<-EOSQL
-        -- Set root password
-        SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${MYSQL_ROOT_PASSWORD}');
+        -- Update root password
+        UPDATE mysql.user SET Password=PASSWORD('${MYSQL_ROOT_PASSWORD}') WHERE User='root';
         
-        -- Delete anonymous users
+        -- Remove anonymous users
         DELETE FROM mysql.user WHERE User='';
         
-        -- Create database (THIS WAS MISSING!)
+        -- Remove test database
+        DROP DATABASE IF EXISTS test;
+        
+        -- Create our database
         CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
         
         -- Create user with access from any host
@@ -38,21 +40,9 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
         -- Apply changes
         FLUSH PRIVILEGES;
 EOSQL
+    echo "MariaDB configuration completed!"
     
-    echo "Stopping temporary MariaDB..."
-    mysqladmin -uroot -p${MYSQL_ROOT_PASSWORD} shutdown
-    sleep 5
-else
-    echo "MariaDB already initialized, checking if database exists..."
-    # Start temporary to check/create database if missing
-    mysqld_safe --datadir=/var/lib/mysql --nowatch &
-    until mysqladmin ping >/dev/null 2>&1; do
-        sleep 2
-    done
-    
-    # Create database if it doesn't exist
-    mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};"
-    
+    # Stop temporary instance
     mysqladmin -uroot -p${MYSQL_ROOT_PASSWORD} shutdown
     sleep 3
 fi
