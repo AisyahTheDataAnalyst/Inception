@@ -1,0 +1,69 @@
+networks:
+  inception:
+    name: inception
+    driver: bridge
+
+volumes:
+  mariadb_data:
+    name: mariadb_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/aimokhta/data/mariadb
+  wordpress_data:
+    name: wordpress_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: home/aimokhta/data/wordpress
+
+secrets:
+  db_user_password: 
+    file: ../secrets/db_user_password.txt
+  db_admin_password: 
+    file: ../secrets/db_admin_password.txt
+  wp_user_password: 
+    file: ../secrets/wp_user_password.txt
+  wp_admin_password: 
+    file: ../secrets/wp_admin_password.txt
+
+services:
+  nginx:
+    build: ./requirements/nginx/.
+    image: nginx:1.0.0
+    container_name: nginx
+    ports: "443:443"
+    env_file: .env
+    volumes: home/aimokhta/data/wordpress
+    networks: inception
+    depends_on: wordpress
+    restart: always
+
+  wordpress:
+    build: ./requirements/wordpress/.
+    image: wordpress:1.0.0
+    container_name: wordpress
+    expose: "9000"
+    env_file: .env
+    secrets:
+      - wp_user_password 
+      - wp_admin_password 
+    networks: inception
+    volumes: home/aimokhta/data/wordpress
+    depends_on: mariadb
+    restart: always
+
+  mariadb:
+    build: ./requirements/mariadb/.
+    image: mariadb:1.0.0
+    container_name: mariadb
+    expose: "3306"
+    env_file: .env
+    secrets:
+      - db_user_password 
+      - db_admin_password 
+    networks: inception
+    volumes: home/aimokhta/data/mariadb
+    restart: always
