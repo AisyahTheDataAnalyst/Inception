@@ -8,16 +8,16 @@ volumes:
     name: mariadb_data
     driver: local
     driver_opts:
-      type: none
-      o: bind
-      device: /home/aimokhta/data/mariadb
+      type: none                              # Tells Docker not to look for a filesystem type (like ext4 or xfs)
+      o: bind                                 # Tells the OS to use a "bind mount" (map a directory to a path)
+      device: /home/aimokhta/data/mariadb     # The physical path on your host, must be absolute path
   wordpress_data:
     name: wordpress_data
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: home/aimokhta/data/wordpress
+      device: /home/aimokhta/data/wordpress
 
 secrets:
   db_user_password: 
@@ -29,41 +29,62 @@ secrets:
   wp_admin_password: 
     file: ../secrets/wp_admin_password.txt
 
+
+# DEPENDENCY GRAPH:
+# MARIADB     =>  WORDPRESS   =>  NGINX                       (The Micro-services)
+# FOUNDATION  =>  ENGINE      =>  GATEWAY                     (Conceptuals)
+# Warehouse   =>  Office      =>  Front Desk & Receptionist   (Anology)
+# DATABASE    =>  APP         =>  WEB SERVER/REVERSE PROXY    (What they are)
+# DATA LAYER  =>  APP LAYER   =>  PRESENTATION LAYER          (TCP Layers)
 services:
-  nginx:
-    build: ./requirements/nginx/.
-    image: nginx:1.0.0
-    container_name: nginx
-    ports: "443:443"
-    env_file: .env
-    volumes: home/aimokhta/data/wordpress
-    networks: inception
-    depends_on: wordpress
+  mariadb:
+    build: ./requirements/mariadb/.
+    image: mariadb:1.0.0
+    container_name: mariadb
     restart: always
+    expose: 
+      - "3306"
+    env_file: 
+      - .env
+    secrets:
+      - db_user_password 
+      - db_admin_password 
+    networks: 
+      - inception
+    volumes: 
+      - mariadb_data:/var/lib/mysql
 
   wordpress:
     build: ./requirements/wordpress/.
     image: wordpress:1.0.0
     container_name: wordpress
-    expose: "9000"
-    env_file: .env
+    restart: always
+    expose: 
+      - "9000"
+    env_file: 
+      - .env
     secrets:
       - wp_user_password 
       - wp_admin_password 
-    networks: inception
-    volumes: home/aimokhta/data/wordpress
-    depends_on: mariadb
-    restart: always
+    networks: 
+      - inception
+    volumes: 
+      - wordpress_data:/var/www/html
+    depends_on: 
+      - mariadb
 
-  mariadb:
-    build: ./requirements/mariadb/.
-    image: mariadb:1.0.0
-    container_name: mariadb
-    expose: "3306"
-    env_file: .env
-    secrets:
-      - db_user_password 
-      - db_admin_password 
-    networks: inception
-    volumes: home/aimokhta/data/mariadb
+  nginx:
+    build: ./requirements/nginx/.
+    image: nginx:1.0.0
+    container_name: nginx
     restart: always
+    ports: 
+      - "443:443"
+    env_file: 
+      - .env
+    volumes: 
+      - wordpress_data:/var/www/html
+    networks: 
+      - inception
+    depends_on: 
+      - wordpress
