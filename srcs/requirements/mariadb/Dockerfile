@@ -29,7 +29,7 @@ EXPOSE 3306
 # rather, CMD is a required keyword parameter that belongs entirely to the HEALTHCHECK command. 
 # Think of it like an if statement in programming: you can't put if on line 1 and condition on line 2 as a separate statement, because the condition is part of the if syntax.
 HEALTHCHECK --interval=5s --timeout=3s --retries=3 \
-    CMD mysqladmin ping -h localhost \
+    CMD mysqladmin ping -h localhost
     # -u root -p$(cat /run/secrets/mysql_root_password) => no need
     # industry standard, as per official & production-grade Docker images maintained by the MariaDB and MySQL teams on Docker Hub
     # An ideal health check should only ask fundamental question: "Is the database service alive and accepting connections?" 
