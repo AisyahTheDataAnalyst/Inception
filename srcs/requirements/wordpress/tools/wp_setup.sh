@@ -16,21 +16,25 @@ echo "❤️‍🔥WORDPRESS INIT SETUP❤️‍🔥 [2/2]✅ MariaDB is fully u
 
 # 1. Check if WordPress is already downloaded in the volume
 if [ ! -f /var/www/html/wp-config.php ]; then
-    echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥 [1/8] Hmmm... WordPress not found. Let's set it up!"
+    echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥      [1/7] Hmmm... WordPress not found. Let's set it up!"
 
 	# 2. Explicitly typing the workdir inside the script acts as a safety net to guarantee 
     #       WP-CLI executes exactly where your WordPress files are supposed to go.
-    echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥 [2/8] Now we're inside Wordpress's volume!"
+    echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥      [2/7] Now we're inside Wordpress's volume!"
     cd /var/www/html
 
-    # 3. Download core WordPress files
-    # 
-    echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥 [3/8] Installing core Wordpress files..."
-    wp-cli core download --allow-root
+    # 3 Download core WordPress files
+    # !not using this anymore - takes double the time than extracting cached wp files (~33s)
+    # echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥 [3/8] Installing core Wordpress files..."
+    # wp-cli core download --allow-root
+
+    # 3 Copy pre-downloaded files instead of hitting the internet
+    echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥      [3/7] Extracting cached Wordpress files..."
+    cp -r /tmp/wordpress/* /var/www/html/
 
 	# 4. Create wp-config.php using environment variables/secrets
     # Note: If using Docker secrets, read the password from the secret file path
-    echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥 [4/8] Installing wp-config.php..."
+    echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥      [4/7] Installing wp-config.php..."
     wp-cli config create \
         --dbname="${MYSQL_DATABASE}" \
         --dbuser="${MYSQL_USER_USERNAME}" \
@@ -40,7 +44,9 @@ if [ ! -f /var/www/html/wp-config.php ]; then
 
 	# 5. Install WordPress and create the core administrator account
     # CRITICAL: Admin username MUST NOT contain "admin" or "administrator"
-    echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥 [5/8] Installing Wordpress & creating admin account..."
+    # --skip-email = Skip the wp_mail() initialization check entirely for this step."
+    # When WordPress is installed via wp core install, it auto attempts to send a "Welcome to WordPress" email to the admin email
+    echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥      [5/7] Installing Wordpress & creating admin account..."
     echo "Debugging Vars: URL=${WP_DOMAIN_URL} Title=${WP_WEBSITE_TITLE} User=${WP_ADMIN_USERNAME}"
     wp-cli core install \
         --url="${WP_DOMAIN_URL}" \
@@ -53,7 +59,9 @@ if [ ! -f /var/www/html/wp-config.php ]; then
 
     # 6. Create the second regular user required by the project
     # syntax: wp user create <username> <email> --user_pass=<password> [options]
-    echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥 [6/8] Creating regular user account..."
+    # do not need to add --skip-email here because the wp user create command does not send an installation email by default.
+    # If you try to add --skip-email to wp user create, WP-CLI will throw an error because --skip-email is not a valid flag for that specific subcommand.
+    echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥      [6/7] Creating regular user account..."
     wp-cli user create \
         "${WP_USER_USERNAME}" \
         "${WP_USER_EMAIL}" \
@@ -61,7 +69,7 @@ if [ ! -f /var/www/html/wp-config.php ]; then
         --role=author \
         --allow-root
         
-    echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥 [7/8] WordPress setup completed successfully!"
+    echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥      [7/7] WordPress setup completed successfully!"
 fi
 
 # 7. Ensure ALL downloaded WordPress files belong to www-data
@@ -69,7 +77,7 @@ chown -R www-data:www-data /var/www/html
 
 # 8. Hand over PID 1 to PHP-FPM running in the foreground (No infinite loops!)
 # "$@" = default arguments set by CMD after ENTRYPOINT in Dockerfile - professional industry standard pattern used in most official Docker images.
-echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥 [8/8] Starting PHP-FPM in the foreground with runtime command: $@"
+echo "❤️‍🔥WORDPRESS EXECUTION❤️‍🔥        Starting PHP-FPM in the foreground with runtime command: $@"
 # exec php-fpm8.2 -F
 exec "$@"
 

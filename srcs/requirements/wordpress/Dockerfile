@@ -20,6 +20,11 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
 	&& chmod +x wp-cli.phar \
 	&& mv wp-cli.phar /usr/local/bin/wp-cli
 
+# Pre-download wordpress core during build so runtime doesn't depend on internet speed
+RUN curl -o /tmp/wordpress.tar.gz https://wordpress.org/wordpress-7.0.tar.gz \
+    && tar -xzf /tmp/wordpress.tar.gz -C /tmp/ \
+    && rm /tmp/wordpress.tar.gz
+
 # Copy your custom PHP-FPM configuration into the container
 COPY ./conf/www.conf /etc/php/8.2/fpm/pool.d/www.conf
 
