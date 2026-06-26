@@ -21,7 +21,7 @@ RUN mkdir -p /var/run/mysqld && \
 COPY tools/mariadb_setup.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/mariadb_setup.sh
 
-# To communicate with other containers that it intended to at runtime
+# EXPOSE in Dockerfile does nothing - Just documentation purposes only
 EXPOSE 3306
 
 # No, they cannot be split into two separate lines.
@@ -38,3 +38,4 @@ HEALTHCHECK --interval=5s --timeout=3s --retries=3 \
 # Default execution for runtime
 # no need to init with ./tools/mariadb_.. coz /usr/local/bin is already system's global env path
 ENTRYPOINT ["mariadb_setup.sh"]
+CMD ["mysqld_safe"]

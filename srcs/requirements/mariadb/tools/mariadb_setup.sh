@@ -12,7 +12,7 @@ fi
 
 # 2. Only run custom SQL configuration if your specific database doesn't exist yet
 if [ ! -d "/var/lib/mysql/${MYSQL_DATABASE}" ]; then
-    echo "🚀MARIADB SETUP🚀 Configuring custom database and users..."
+    echo "🚀MARIADB SETUP🚀 [1/4] Configuring custom database and users..."
 
     mysqld_safe --skip-networking & pid=$!
 
@@ -29,11 +29,19 @@ if [ ! -d "/var/lib/mysql/${MYSQL_DATABASE}" ]; then
     mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';"
 
     # 2.3 Shutdown using the newly created password
+    echo "🚀MARIADB SETUP🚀 [2/4] Shutting down temporary mysql process that just to init database creation"
     mysqladmin -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown
     wait $pid
 fi
 
-exec mysqld_safe
+echo "❤️‍🔥WORDPRESS SETUP❤️‍🔥 [3/4] WordPress setup completed successfully!"
+
+# making mysql daemon becoming PID1 => forced to work in the foreground, not background as per set by '&' above
+# Hand over PID 1 (forced to work in foreground) to whatever command was passed into the CMD directive
+# "$@" = default arguments set by CMD after ENTRYPOINT in Dockerfile - professional industry standard pattern used in most official Docker images.
+echo "🚀MARIADB SETUP🚀 [4/4] Executing MariaDB in the foreground with runtime command: $@"
+# exec mysqld_safe
+exec "$@"
 
 
 

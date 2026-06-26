@@ -8,16 +8,16 @@ volumes:
     name: mariadb_data
     driver: local
     driver_opts:
-      type: none                              # Tells Docker not to look for a filesystem type (like ext4 or xfs)
-      o: bind                                 # Tells the OS to use a "bind mount" (map a directory to a path)
-      device: /home/aimokhta/data/mariadb     # The physical path of the volume on your host, must be absolute path
+      type: none                                # Tells Docker not to look for a filesystem type (like ext4 or xfs)
+      o: bind                                   # Tells the OS to use a "bind mount" (map a directory to a path)
+      device: /home/aimokhta/data/mariadb_data  # The physical path of the volume on your host, must be absolute path
   wordpress_data:
     name: wordpress_data
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/aimokhta/data/wordpress
+      device: /home/aimokhta/data/wordpress_data
 
 # Original way to implements secrets but requires messy sript line is .sh files
 # secrets:
@@ -38,7 +38,7 @@ services:
     build: ./requirements/mariadb/.
     image: mariadb:1.0.0
     container_name: mariadb
-    restart: always
+    restart: unless-stopped
     expose: 
       - "3306"
     env_file: 
@@ -47,38 +47,37 @@ services:
       - inception
     volumes: 
       - mariadb_data:/var/lib/mysql
-      - ../secrets/db_admin_password.txt:/run/secrets/db_admin_password:ro
-      - ../secrets/db_user_password.txt:/run/secrets/db_user_password:ro
       - ../secrets/mysql_root_password.txt:/run/secrets/mysql_root_password:ro
       - ../secrets/mysql_user_password.txt:/run/secrets/mysql_user_password:ro
 
-  # wordpress:
-  #   build: ./requirements/wordpress/.
-  #   image: wordpress:1.0.0
-  #   container_name: wordpress
-  #   restart: always
-  #   expose: 
-  #     - "9000"
-  #   env_file: 
-  #     - .env
-  #   secrets:
-  #     - wp_user_password 
-  #     - wp_admin_password 
-  #   networks: 
-  #     - inception
-  #   volumes: 
-  #     - wordpress_data:/var/www/html
-  #     - ../secrets/wp_admin_password.txt:/run/secrets/wp_admin_password:ro
-  #     - ../secrets/wp_user_password.txt:/run/secrets/wp_user_password:ro
-  #   depends_on: 
-  #     mariadb
-          # condition: service_healthy
+  wordpress:
+    build: ./requirements/wordpress/.
+    image: wordpress:1.0.0
+    container_name: wordpress
+    restart: unless-stopped
+    expose: # what it listens to
+      - "9000"
+    env_file: 
+      - .env
+    # secrets:
+    #   - wp_user_password 
+    #   - wp_admin_password 
+    networks: 
+      - inception
+    volumes: 
+      - wordpress_data:/var/www/html
+      - ../secrets/wp_admin_password.txt:/run/secrets/wp_admin_password:ro
+      - ../secrets/wp_user_password.txt:/run/secrets/wp_user_password:ro
+      - ../secrets/mysql_user_password.txt:/run/secrets/mysql_user_password:ro
+    depends_on: 
+      mariadb:
+          condition: service_healthy
 
   # nginx:
   #   build: ./requirements/nginx/.
   #   image: nginx:1.0.0
   #   container_name: nginx
-  #   restart: always
+  #   restart: unless-stopped
   #   ports: 
   #     - "443:443"
   #   env_file: 
