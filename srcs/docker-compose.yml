@@ -73,18 +73,18 @@ services:
       mariadb:
           condition: service_healthy
 
-  # nginx:
-  #   build: ./requirements/nginx/.
-  #   image: nginx:1.0.0
-  #   container_name: nginx
-  #   restart: unless-stopped
-  #   ports: 
-  #     - "443:443"
-  #   env_file: 
-  #     - .env
-  #   volumes: 
-  #     - wordpress_data:/var/www/html
-  #   networks: 
-  #     - inception
-  #   depends_on: 
-  #     - wordpress
+  nginx:
+    build: ./requirements/nginx/.
+    image: nginx:1.0.0
+    container_name: nginx
+    restart: unless-stopped
+    ports: 
+      - "443:443"
+    env_file: 
+      - .env
+    volumes: 
+      - wordpress_data:/var/www/html
+    networks: 
+      - inception
+    depends_on: 
+      - wordpress
