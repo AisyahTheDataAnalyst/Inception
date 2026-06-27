@@ -40,7 +40,7 @@ clean:
 	
 fclean: clean
 	@sudo rm -rf ~/data
-	@echo "${PURPLE}\n🗑️  Removed all volumes on host! ${RESET}"
+	@echo "${PURPLE}\n🗑️  Removed all volumes on host! ${RESET}\n"
 
 re: fclean all
 
