@@ -8,9 +8,14 @@ RUN apt-get update -y && \
     apt-get upgrade -y && \
     apt-get install -y mariadb-server && \
     rm -rf /var/lib/apt/lists/*			
-	
-# Copy configuration
-COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
+
+# ip from 127.0.0.1 => 0.0.0.0
+# method 1 = Copy configuration (50-server.cnf)
+# COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf => use sed instead coz just want to replace ip address only
+# method 2  = sed command (in Dockerfile here, what im using now)
+# Replace 127.0.0.1 with 0.0.0.0 in the default MariaDB config file 
+RUN sed -i 's/bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/g' /etc/mysql/mariadb.conf.d/50-server.cnf
+# method 3 => command (docker-compose.yml) => DONT USE => newer MariaDB installation dont accept database runtime config flags directly on CLI => crashes => "unhealthy" => + many more other issues => not suitable for manual installation
 
 # Setup runtime directories with correct permissions
 RUN mkdir -p /var/run/mysqld && \
@@ -29,7 +34,7 @@ EXPOSE 3306
 # rather, CMD is a required keyword parameter that belongs entirely to the HEALTHCHECK command. 
 # Think of it like an if statement in programming: you can't put if on line 1 and condition on line 2 as a separate statement, because the condition is part of the if syntax.
 HEALTHCHECK --interval=5s --timeout=3s --retries=3 \
-    CMD mysqladmin ping -h localhost
+    CMD mysqladmin ping -h localhost --protocol=tcp
     # -u root -p$(cat /run/secrets/mysql_root_password) => no need
     # industry standard, as per official & production-grade Docker images maintained by the MariaDB and MySQL teams on Docker Hub
     # An ideal health check should only ask fundamental question: "Is the database service alive and accepting connections?" 

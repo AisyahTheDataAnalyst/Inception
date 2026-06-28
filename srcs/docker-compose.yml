@@ -41,6 +41,7 @@ services:
     restart: unless-stopped
     expose: 
       - "3306"
+    # command: --bind-address=0.0.0.0   # not suitable for manual MatiaDB installation, use sed in Dockerfile instead
     env_file: 
       - .env
     networks: 

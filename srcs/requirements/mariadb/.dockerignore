@@ -4,6 +4,12 @@
 .dockerignore
 Dockerfile
 
+# only need to overwrite ip address only, 
+# using sed in Dockerfile (yes way!) / command in docker-compose.yml, so this file no longer needed (not suitable for manual installation)
+# standard Ubuntu/Debian base image where you manually installed MariaDB - locked down to 127.0.0.1
+# if pull Docker Hub of from official MariaDB Docker image - already defaults to listening on 0.0.0.0 -  no need 50-server nor sed command
+50-server.cnf
+
 # all below is not needed, coz .docker ignore dosent reach them
 # unless i use global .dockerignore == placed at the root directory, same as Makefile
 # In Docker, you never use ../ inside a .dockerignore file. 

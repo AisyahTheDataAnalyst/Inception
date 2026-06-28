@@ -25,8 +25,11 @@ RUN curl -o /tmp/wordpress.tar.gz https://wordpress.org/wordpress-7.0.tar.gz \
     && tar -xzf /tmp/wordpress.tar.gz -C /tmp/ \
     && rm /tmp/wordpress.tar.gz
 
-# Copy your custom PHP-FPM configuration into the container
-COPY ./conf/www.conf /etc/php/8.2/fpm/pool.d/www.conf
+# # NO NEED MANUAL CONFIG FILE - Copy your custom PHP-FPM configuration into the container
+# COPY ./conf/www.conf /etc/php/8.2/fpm/pool.d/www.conf
+# can either do this in Dockerfile or script file (i choose .sh file)
+# 	=> Change PHP-FPM to listen on port 9000 instead of a local socket file
+# RUN echo "listen = 9000" >> /etc/php/8.2/fpm/pool.d/www.conf
 
 # Setup HTML directories and run paths for PHP runtime sockets
 # Create the directory for PHP-FPM runtime files (sockets/pids) if needed
