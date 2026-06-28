@@ -45,7 +45,6 @@ EXPOSE 9000
 COPY ./tools/wp_setup.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/wp_setup.sh
 
+# ('-F') Run PHP-FPM in the foreground so the container doesn't immediately exit
 ENTRYPOINT ["/usr/local/bin/wp_setup.sh"]
-
-# Run PHP-FPM in the foreground ('-F') so the container doesn't immediately exit
-CMD ["php-fpm8.2", "-F"]
+CMD ["php-fpm8.2", "-F"]  

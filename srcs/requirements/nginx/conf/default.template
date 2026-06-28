@@ -1,0 +1,35 @@
+# DO NOT include events {} or http {} here! Alpine handles that.
+
+server {
+	# Listen only on port 443 for SSL/TLS connections
+	#IPv4 - enough for network bridges that default amost entirely to IPv4 routing internally
+	#for IPv6 - no need 
+	listen 443 ssl;
+	# listen [::]:443 ssl;
+
+	# The domain name will be dynamically inserted here
+	server_name $WP_DOMAIN_URL;
+
+	# TLS protocol enforcement
+	ssl_protocols TLSv1.2 TLSv1.3;
+	ssl_certificate /etc/nginx/ssl/inception.crt;
+	ssl_certificate_key /etc/nginx/ssl/inception.key;
+
+	# Root directory for WordPress website files
+	root /var/www/html;
+	index index.php index.html index.htm;
+
+	location / {
+		try_files $uri $uri/ /index.php?$args;
+	}
+
+	# Pass PHP requests to the WordPress container via port 9000
+	location ~ \.php$ {
+		include fastcgi_params;
+		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		fastcgi_pass wordpress:9000;
+		fastcgi_index index.php;
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_param PATH_INFO $fastcgi_path_info;
+	}
+}

@@ -1,0 +1,25 @@
+# Docker reads the Dockerfile first: 
+# When you trigger a build, 
+# Docker reads the Dockerfile instructions and loads them into memory before it processes the .dockerignore file.
+.dockerignore
+Dockerfile
+
+# all below is not needed, coz .docker ignore dosent reach them
+# unless i use global .dockerignore == placed at the root directory, same as Makefile
+# In Docker, you never use ../ inside a .dockerignore file. 
+# Docker prohibits path traversal above the build context for security reasons. 
+# Instead, you write paths moving downward from the root.
+
+
+# Ignore secret environment variables completely from image builds
+# .env
+# *.env
+# secrets/
+
+# Ignore Git files
+# .git
+# .gitignore
+
+# Ignore local development files and documentation
+# *.md
+# Makefile
