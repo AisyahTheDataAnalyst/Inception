@@ -1,5 +1,11 @@
 FROM debian:bookworm
 
+# this is highly recommended for your Debian containers
+# Stop interactive prompts during installation
+# If you want it to only apply while the image is building and disappear afterward, use ARG
+# using ENV, that variable stays alive inside the container forever, even after it finishes building.
+ARG DEBIAN_FRONTEND=noninteractive
+
 # Install MariaDB and tools
 # /var/lib/apt/lists/*  
 # =>	Lists only from "apt update" are downloaded & saved as text files directly into this directory, 

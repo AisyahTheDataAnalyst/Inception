@@ -9,6 +9,7 @@ Dockerfile
 # standard Ubuntu/Debian base image where you manually installed MariaDB - locked down to 127.0.0.1
 # if pull Docker Hub of from official MariaDB Docker image - already defaults to listening on 0.0.0.0 -  no need 50-server nor sed command
 50-server.cnf
+conf/
 
 # all below is not needed, coz .docker ignore dosent reach them
 # unless i use global .dockerignore == placed at the root directory, same as Makefile

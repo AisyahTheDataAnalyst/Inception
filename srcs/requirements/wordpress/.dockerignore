@@ -8,6 +8,7 @@ Dockerfile
 # WP-CLI dynamically writes out a brand new, valid PHP file from scratch.
 # so no need to write manually wordpress's config file
 www.conf
+conf/
 
 # all below is not needed, coz .docker ignore dosent reach them
 # unless i use global .dockerignore == placed at the root directory, same as Makefile

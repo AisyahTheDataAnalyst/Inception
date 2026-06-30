@@ -6,7 +6,7 @@ networks:
 volumes:
   mariadb_data:
     name: mariadb_data
-    driver: local
+    driver: local                               # Create and manage this volume using the local filesystem of the host machine (your VM) where Docker is running.
     driver_opts:
       type: none                                # Tells Docker not to look for a filesystem type (like ext4 or xfs)
       o: bind                                   # Tells the OS to use a "bind mount" (map a directory to a path)

@@ -4,19 +4,18 @@
 ### `EVAL_CHECKLIST.md`
 
 ---
-```markdown
 # 42 Inception Correction Sheet Step-by-Step Blueprint
 
-This checklist follows the exact sequence of the official 42 Inception evaluation sheet. Use these commands side-by-side with your evaluator to verify every requirement smoothly[cite: 19].
-```
+This checklist follows the exact sequence of the official 42 Inception evaluation sheet. Use these commands side-by-side with your evaluator to verify every requirement smoothly.
+
 ---
 
 ## Part 1: Preliminary Requirements & Hygiene
 
-Before spinning up the infrastructure, the evaluator will check your repository structure and environment setup[cite: 20].
+Before spinning up the infrastructure, the evaluator will check your repository structure and environment setup.
 
 ### A. Repository Structure Check
-Ensure that all required configuration directories are in place and no loose files are left in the root[cite: 20]:
+Ensure that all required configuration directories are in place and no loose files are left in the root:
 ```bash
 # List everything in the root directory to prove cleanliness
 ls -la

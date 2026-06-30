@@ -8,7 +8,7 @@
 
 # Developer & System Administrator Documentation
 
-This document outlines the step-by-step setup, configuration pathways, and core development tools used to maintain the Inception project stack[cite: 20].
+This document outlines the step-by-step setup, configuration pathways, and core development tools used to maintain the Inception project stack.
 
 ## Development Prerequisites
 
@@ -23,7 +23,7 @@ This document outlines the step-by-step setup, configuration pathways, and core 
 ---
 
 ## Directory Schema Topology
-The repository is structured to separate your service configurations from runtime application data[cite: 20]:
+The repository is structured to separate your service configurations from runtime application data:
 
 
 ```
@@ -60,7 +60,7 @@ The repository is structured to separate your service configurations from runtim
 ## Environmental Setup & Configuration
 
 ### 1. Secrets Initialization
-Before launching the stack, provision the target `secrets/` directory at the root of your repository to securely manage runtime database and application credentials[cite: 3, 20]:
+Before launching the stack, provision the target `secrets/` directory at the root of your repository to securely manage runtime database and application credentials:
 ```bash
 mkdir -p secrets
 echo "your_secure_root_pass" > secrets/mysql_root_password.txt

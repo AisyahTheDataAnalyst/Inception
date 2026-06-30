@@ -1,8 +1,11 @@
 # Base image - Debian is the industry standard for Wordpress
 FROM debian:bookworm 
 
+# this is highly recommended for your Debian containers
 # Stop interactive prompts during installation
-ENV DEBIAN_FRONTEND=noninteractive
+# If you want it to only apply while the image is building and disappear afterward, use ARG
+# using ENV, that variable stays alive inside the container forever, even after it finishes building.
+ARG DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies (PHP-FPM, PHP-MySQL extension, and curl/wget to grab WordPress)
 RUN apt-get update && apt-get install -y \
