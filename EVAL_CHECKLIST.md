@@ -20,7 +20,6 @@ Ensure that all required configuration directories are in place and no loose fil
 ```bash
 # List everything in the root directory to prove cleanliness
 ls -la
-
 ```
 
 Verify that only the `Makefile`, `srcs/`, and your documentation (`.md`) files exist at the root level.
@@ -36,7 +35,6 @@ cat srcs/.env
 # Check that the secrets directory exists locally but is ignored by Git
 ls -la secrets/
 git status
-
 ```
 
 Confirm that no raw root database passwords or admin account credentials are exposed inside `srcs/.env` or tracked in Git history.
@@ -48,7 +46,6 @@ Prove that your environment builds from scratch and boots cleanly on demand:
 ```bash
 # Run the default rule to build images, configure host volumes, and launch containers
 make
-
 ```
 
 *The command must execute without throwing script execution faults, build warnings, or configuration errors.*
@@ -67,7 +64,6 @@ Show your evaluator that the entire stack runs within an isolated Linux VM envir
 # Display system distribution information
 uname -a
 cat /etc/os-release
-
 ```
 
 ### B. "From Scratch" Image Building Validation
@@ -83,7 +79,6 @@ grep -i "^FROM" srcs/requirements/wordpress/Dockerfile
 
 # Check MariaDB Dockerfile for base layer definition
 grep -i "^FROM" srcs/requirements/mariadb/Dockerfile
-
 ```
 
 Each statement must point to a clean base distribution image, not a pre-configured solution like `FROM wordpress:latest`.
@@ -97,7 +92,6 @@ Prove that your custom setup scripts use `exec "$@"` to pass control directly to
 grep -n "exec" srcs/requirements/mariadb/tools/mariadb_setup.sh
 grep -n "exec" srcs/requirements/nginx/tools/nginx_setup.sh
 grep -n "exec" srcs/requirements/wordpress/tools/wp_setup.sh
-
 ```
 
 ---
@@ -113,7 +107,6 @@ Verify that your configurations are managed using the proper Compose file layout
 ```bash
 # Display the service composition setup file
 cat srcs/docker-compose.yml
-
 ```
 
 Verify that the file version parameter is set correctly, and that container name configurations align with the standard rules.
@@ -126,7 +119,6 @@ Confirm that your custom network is a private bridge (`inception`) and that the 
 # Inspect the active network configurations
 docker network ls
 docker network inspect inception
-
 ```
 
 Ensure all three containers (`nginx`, `wordpress`, `mariadb`) are mapped to the bridge network and can communicate with each other securely.
@@ -143,11 +135,10 @@ Confirm that your entry point only processes encrypted traffic on port 443 and c
 
 ```bash
 # 1. Attempt unencrypted connection on port 80 (Must throw connection failure)
-curl -I [http://aimokhta.42.fr](http://aimokhta.42.fr)
+curl -I http://aimokhta.42.fr 
 
 # 2. Attempt encrypted connection on port 443 (Must connect successfully)
-curl -kI [https://aimokhta.42.fr](https://aimokhta.42.fr)
-
+curl -kI https://aimokhta.42.fr
 ```
 
 ### B. TLS Version Compliance Verification
@@ -163,7 +154,6 @@ openssl s_client -connect aimokhta.42.fr:443 -tls1_2
 
 # Test verified TLSv1.3 compliance (Must connect successfully)
 openssl s_client -connect aimokhta.42.fr:443 -tls1_3
-
 ```
 
 *Look for the line containing `Protocol : TLSv1.2` or `Protocol : TLSv1.3` inside the connection feedback blocks.*
@@ -175,7 +165,6 @@ Verify that your custom domain route points to your local system address:
 ```bash
 # Inspect the loopback mapping configuration
 cat /etc/hosts | grep aimokhta.42.fr
-
 ```
 
 ---
@@ -191,7 +180,6 @@ Verify that Nginx is not running inside your WordPress container, confirming tha
 ```bash
 # Scan the active internal process environment of WordPress
 docker exec -it wordpress ps aux
-
 ```
 
 The output should only show your PHP-FPM runtime processes and your setup script—no Nginx processes allowed.
@@ -203,7 +191,6 @@ Verify that your WordPress environment uses a network socket on port 9000 rather
 ```bash
 # Verify active listening boundaries inside the container
 docker exec -it wordpress netstat -lntp | grep 9000
-
 ```
 
 ### C. WP-CLI Configuration & User Identity Audit
@@ -213,7 +200,6 @@ The evaluation rules state that your administrative username cannot contain term
 ```bash
 # List all registered users, display names, and roles
 docker exec -it wordpress wp user list --allow-root
-
 ```
 
 Confirm that `wproot` holds the administrator privileges and `wpuser` maps to an author status.
@@ -231,7 +217,6 @@ Verify that neither Nginx nor WordPress are running inside your database contain
 ```bash
 # Scan internal process list inside MariaDB
 docker exec -it mariadb ps aux
-
 ```
 
 The output should only show your core database engine processes (`mysqld` or `mysqld_safe`).
@@ -243,7 +228,6 @@ Prove that the database service cannot be reached from your host machine, ensuri
 ```bash
 # Attempt direct host-to-database connection (Must fail to connect)
 mysql -u sqluser -h 127.0.0.1 -P 3306 -p
-
 ```
 
 ### C. Live Table Population Check
@@ -253,18 +237,19 @@ Log into your database using your application user credentials to prove that you
 ```bash
 # Access the MariaDB management CLI shell
 docker exec -it mariadb mysql -u sqluser -p
-
 ```
 
 *Enter your application user password when prompted. Then, run the following SQL queries to inspect your tables:*
 
 ```sql
+-- access the databases
+SHOW DATABASES;
+
 -- Select your wordpress target context
 USE wordpress_db;
 
 -- Display all tables populated by the WordPress installer loop
 SHOW TABLES;
-
 ```
 
 *Ensure you see a clean output listing your core WordPress tables (e.g., `wp_users`, `wp_posts`, `wp_comments`). Type `exit` to close the interface.*
@@ -285,7 +270,6 @@ docker volume inspect mariadb_data | grep Mountpoint
 
 # Verify the physical location of your website content storage volume
 docker volume inspect wordpress_data | grep Mountpoint
-
 ```
 
 ### B. Persistence Stress Test
@@ -306,7 +290,6 @@ ls -la /home/aimokhta/data/wordpress_data
 make
 
 # 5. Refresh your browser and confirm your custom posts and comments are still there!
-
 ```
 
 ---
@@ -322,7 +305,6 @@ During evaluation, you may be asked to change an environment variable or network
 
 ```bash
 make down
-
 ```
 
 
@@ -333,7 +315,6 @@ make down
 ```yaml
 ports:
   - "8443:443"
-
 ```
 
 
@@ -342,10 +323,7 @@ ports:
 
 ```bash
 make
-
 ```
 
 
 5. Demonstrate to the evaluator that the site now loads successfully at the new address: `https://aimokhta.42.fr:8443`.
-
-
